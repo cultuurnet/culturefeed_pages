@@ -255,12 +255,12 @@ function culturefeed_pages_set_active_page(CultureFeed_Cdb_Item_Page $page) {
 
   $_SESSION['culturefeed']['page'] = $page;
 
-  $account = DrupalCultureFeed::getLoggedInAccount();
-  $data = isset($account->data) ? $account->data : array();
+  global $user;
+  $data = isset($user->data) ? $user->data : array();
   $data['culturefeed_pages_id'] = $page->getId();
-  $account->data = $data;
+  $user->data = $data;
 
-  user_save($account);
+  user_save($user);
 
 }
 
@@ -271,12 +271,12 @@ function culturefeed_pages_remove_active_page() {
 
   unset($_SESSION['culturefeed']['page']);;
 
-  $account = DrupalCultureFeed::getLoggedInAccount();
-  $data = isset($account->data) ? $account->data : array();
+  global $user;
+  $data = isset($account->data) ? $user->data : array();
   unset($data['culturefeed_pages_id']);
-  $account->data = $data;
+  $user->data = $data;
 
-  user_save($account);
+  user_save($user);
 
 }
 
@@ -404,8 +404,8 @@ function culturefeed_pages_block_request_admin_membership(CultureFeed_Cdb_Item_P
 
   // Only for pages if the current user is already member of the page AND
   // if the page does not have a default admin yet.
-  $account = DrupalCultureFeed::getLoggedInAccount();
-  if (!$account) {
+  $uid = DrupalCultureFeed::getLoggedInUserId();
+  if (!$uid) {
     return;
   }
 

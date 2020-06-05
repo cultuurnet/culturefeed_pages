@@ -737,6 +737,42 @@ function _culturefeed_pages_preprocess_page_metatags(&$variables) {
     ),
   ), 'meta_description');
 
+  // Add open graph meta tags.
+  $og_tags = [];
+  $fb_app_id = variable_get('culturefeed_search_ui_fb_app_id', '');
+  if (!empty($fb_app_id)) {
+    $og_tags['fb:app_id'] = $fb_app_id;
+  }
+  $og_tags['og:site_name'] = variable_get('site_name', '');
+  $og_tags['og:url'] = url(culturefeed_search_detail_url('page', $variables['id'], $variables['title']), array('absolute' => TRUE));
+  $og_tags['og:description'] = implode(' - ', $description_parts);
+  if ($variables['image']) {
+    $image = str_replace(' ', '%20', $variables['image']);
+    $colonpos = strpos($image, ':');
+    if ($colonpos) {
+      $image = substr($image, $colonpos + 1);
+    }
+    $image_path = 'http:' . $image;
+    $image_secure_path = 'https:' . $image;
+    $og_tags['og:image'] = $image_path . '?width=1200&height=628&crop=auto&scale=both';
+    $og_tags['og:image:secure_url'] = $image_secure_path . '?width=1200&height=628&crop=auto&scale=both';
+  }
+  else {
+    $path = drupal_get_path('module', 'culturefeed_agenda');
+    $og_tags['og:image'] = url($path . '/images/no-thumbnail.png', array('absolute' => TRUE));
+  }
+  $og_tags['og:image:width'] = '1200';
+  $og_tags['og:image:height'] = '628';
+
+  foreach ($og_tags as $property => $content) {
+    drupal_add_html_head(array(
+      '#tag' => 'meta',
+      '#attributes' => array(
+        'property' => $property,
+        'content' => $content,
+      ),
+    ), $property);
+  }
 }
 
 /**
